@@ -28,15 +28,26 @@ def all_valid_hooks(hooks: List[Hook]) -> bool:
 
 
 def valid_hooks(hooks: List[Hook]) -> List[Hook]:
-    hook_names = [_name(hook) for hook in _normal_hooks(hooks)]
-    valid_names = GUET_HOOKS == hook_names
-    valid_content = all([hook.is_guet_hook() for hook in _normal_hooks(hooks)])
-    if (valid_names and valid_content):
-        return [hook for hook in hooks if _name(hook).replace('-guet', '') in hook_names]
-    if not (valid_names and valid_content):
-        hook_names = [_name(hook).replace('-guet', '') for hook in _dash_guet_normal_hooks(hooks)]
+    """Validate a list of hooks and return valid ones."""
+    if not hooks:
+        return []  # early return for empty input
+
+    # first validation
+    normal_hooks = _normal_hooks(hooks)
+    if normal_hooks:  # only validate if normal_hooks is non-empty
+        hook_names = [_name(hook) for hook in normal_hooks]
         valid_names = GUET_HOOKS == hook_names
-        valid_content = all([hook.is_guet_hook() for hook in _dash_guet_normal_hooks(hooks)])
+        valid_content = all(hook.is_guet_hook() for hook in normal_hooks)
         if valid_names and valid_content:
             return [hook for hook in hooks if _name(hook).replace('-guet', '') in hook_names]
+
+    # second validation
+    dash_guet_hooks = _dash_guet_normal_hooks(hooks)
+    if dash_guet_hooks:  # only validate if dash_guet_hooks is non-empty
+        hook_names = [_name(hook).replace('-guet', '') for hook in dash_guet_hooks]
+        valid_names = GUET_HOOKS == hook_names
+        valid_content = all(hook.is_guet_hook() for hook in dash_guet_hooks)
+        if valid_names and valid_content:
+            return [hook for hook in hooks if _name(hook).replace('-guet', '') in hook_names]
+
     return []

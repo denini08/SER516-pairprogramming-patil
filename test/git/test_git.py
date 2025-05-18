@@ -221,6 +221,19 @@ class TestGit(TestCase):
         git.hooks = []
         self.assertFalse(git.non_guet_hooks_present())
 
+    def test_hooks_present_returns_false_for_empty_hooks(self, _1, _2):
+        git = Git(self.path_to_git)
+        git.hooks = []
+        self.assertFalse(git.hooks_present(), "hooks_present should return False when hooks list is empty")
+
+    def test_hooks_present_returns_false_for_invalid_hooks(self, _1, _2):
+        git = Git(self.path_to_git)
+        git.hooks = [
+            _mock_hook(join(str(self.path_to_git), 'hooks', 'invalid-hook'), is_guet_hook=False),
+            _mock_hook(join(str(self.path_to_git), 'hooks', 'another-hook'), is_guet_hook=False)
+        ]
+        self.assertFalse(git.hooks_present(), "hooks_present should return False when hooks are invalid")
+
     def test_create_hooks_adds_new_files(self, mock_hook, _2):
         git = Git(self.path_to_git)
         git.hooks = []
